@@ -39,9 +39,21 @@ public class sketch_131112a extends PApplet {
 	}
 
 	public void setup() {
+		int
+			i, j,
+			n = 6,
+			spacing = windowSize / n;
+
 		size(windowSize, windowSize, P2D);
 		frameRate(24);
 		obList.add(new Grid(6));
+
+		for(i = 0; i < n; i++){
+			for(j = 1; j < n; j++){
+				obList.add(new Target(-half + (spacing * i), -half + (spacing * j), i % 2, j * i % 2));
+			}
+		}
+
 		addParticle(10, 0, 6, 4);
 	}
 
@@ -108,6 +120,57 @@ public class sketch_131112a extends PApplet {
 			}
 		}
 	}
+
+	public class Target extends Ob{
+		int
+			x, y,
+			velX, velY,
+			phase,
+			targetOuter = 5, targetInner = 2;
+		float tO, tI;
+
+		public Target(int aX, int aY, int vX, int vY){
+			x = aX;
+			y = aY;
+			velX = vX;
+			velY = vY;
+			phase = 0;
+		}
+		public void update(){
+			x += velX;
+			y += velY;
+			if(x > half){
+				x = -half;
+			}
+			if(y > half){
+				y = -half;
+			}
+			phase += 36;
+			tO = (float) (sinFrac(deg * phase) * 2) + 1;
+			tI = (float) (sinFrac(deg * phase) * 1) + 2;
+		}
+		public void drawTargetShape(){
+			stroke(0.2f, 1, 1, 0);
+
+			line(-targetOuter * tO, -targetOuter * tO, -targetInner * tI, -targetOuter * tO);
+			line(targetInner * tI, -targetOuter * tO, targetOuter * tO, -targetOuter * tO);
+			line(targetOuter * tO, -targetOuter * tO, targetOuter * tO, -targetInner * tI);
+			line(targetOuter * tO, targetInner * tI, targetOuter * tO, targetOuter * tO);
+			line(targetOuter * tO, targetOuter * tO, targetInner * tI, targetOuter * tO);
+			line(-targetInner * tI, targetOuter * tO, -targetOuter * tO, targetOuter * tO);
+			line(-targetOuter * tO, targetOuter * tO, -targetOuter * tO, targetInner * tI);
+			line(-targetOuter * tO, -targetInner * tI, -targetOuter * tO, -targetOuter * tO);
+
+		}
+		public void render(){
+			pushMatrix();
+			translate(x, y);
+			//scale((float) (1 + sinFrac(deg * phase)));
+			drawTargetShape();
+			popMatrix();
+		}
+	}
+
 
 	void addParticle(int n, double phase, double curl, double speed) {
 		int i;
