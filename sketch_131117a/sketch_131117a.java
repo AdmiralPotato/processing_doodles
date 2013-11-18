@@ -155,17 +155,19 @@ public class sketch_131117a extends PApplet {
 		public void render() {
 			int i;
 			double r;
-			float rX, rY;
+			float
+					rX, rY,
+					hue = (float) ((sinFrac(angle) * 0.0125) + 0.75) % 1;
 			stroke(
-					(float) ((sinFrac(angle) * 0.0125) + 0.7) % 1, //hue
+					hue,
 					1.0f, //saturation
-					0.75f, //luminosity
+					0.65f, //luminosity
 					1 //alpha
 			);
 			fill(
-					(float) ((sinFrac(angle) * 0.0125) + 0.7) % 1, //hue
+					hue,
 					1.0f, //saturation
-					0.5f, //luminosity
+					0.35f, //luminosity
 					1 //alpha
 			);
 			strokeWeight(2);
