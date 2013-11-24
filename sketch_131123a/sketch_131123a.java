@@ -136,7 +136,7 @@ public class sketch_131123a extends PApplet {
 		return (cos(a) / 2) + 0.5f;
 	}
 
-	void drawEqualateralPolygon(int n, float radius){
+	void drawEquilateralPolygon(int n, float radius){
 		int
 				i;
 		float
@@ -219,14 +219,14 @@ public class sketch_131123a extends PApplet {
 
 			noStroke();
 			fill(fillColor);
-			drawEqualateralPolygon(6, radius);
+			drawEquilateralPolygon(6, radius);
 
 			noFill();
 			stroke(strokeColor);
 			strokeWeight(2);
 			strokeCap(ROUND);
 			strokeJoin(MITER);
-			drawEqualateralPolygon(6, radius);
+			drawEquilateralPolygon(6, radius);
 
 			popMatrix();
 		}
