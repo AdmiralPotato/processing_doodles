@@ -3,7 +3,7 @@
  * User: admiral
  * Date: 11/23/13
  * Time: 02:49 AM
- * Additive Circles
+ * Additive Circles - Actually, Flower Patch
  */
 
 import processing.core.*;
@@ -19,9 +19,9 @@ public class sketch_131124a extends PApplet {
 		half = size / 2,
 		currentFrame = 0,
 		maxFrames = 48,
-		samplesPerFrame = 1,
+		samplesPerFrame = 32,
 		preserveAlpha = 0xff000000,
-		numberOfThings = 24;
+		numberOfThings = 72;
 	int[][]
 			motionBlurBuffer;
 
@@ -196,10 +196,10 @@ public class sketch_131124a extends PApplet {
 			radius = (148 * (1 - (frac * (offset + 1)))) + 4;
 		}
 		public void update() {
-			float positionalAngle = time * (tau + (pi * frac * offset));
+			float positionalAngle = (time * tau) + (pi * frac * offset * 90);
 			angle = sin(time * tau) * pi * frac * offset;
-			x = cos(positionalAngle) * radius * 0.5f;
-			y = sin(positionalAngle) * radius * 0.5f;
+			x = cos(positionalAngle) * radius;
+			y = sin(positionalAngle) * radius;
 			z = frac * offset * 120;
 		}
 		public void render() {
@@ -207,15 +207,16 @@ public class sketch_131124a extends PApplet {
 					strokeColor = color(
 						((sinFrac(angle / 2.0f) * 0.125f) + 0.4f) % 1.0f, //hue
 						1.0f, //saturation
-						0.5f, //luminosity
+						0.75f, //luminosity
 						1 //alpha
 					),
 					fillColor = color(
 							((sinFrac(angle / 2.0f) * 0.125f) + 0.5f) % 1.0f, //hue
 							1.0f, //saturation
-							frac * 1.25f, //luminosity
+							((1 - (frac * offset)) * 0.5f) % (1f / 20f), //luminosity
 							1 //alpha
-					);
+					),
+					numEdges = ((numberOfThings - offset) % 9) + 2;
 
 			pushMatrix();
 			translate(x, y, z);
@@ -223,7 +224,7 @@ public class sketch_131124a extends PApplet {
 
 			noStroke();
 			fill(fillColor);
-			drawEquilateralPolygon(((numberOfThings - offset) + 2) * 2, radius + radius * 0.25f);
+			drawEquilateralPolygon(numEdges * 2, radius * 1.0625f);
 			//ellipse(0,0, radius * 2, radius * 2);
 
 			noFill();
@@ -231,7 +232,7 @@ public class sketch_131124a extends PApplet {
 			strokeWeight(2);
 			strokeCap(ROUND);
 			strokeJoin(MITER);
-			drawEquilateralPolygon((numberOfThings - offset) + 2, radius);
+			drawEquilateralPolygon(numEdges, radius);
 			//ellipse(0,0, radius * 2, radius * 2);
 
 			popMatrix();
