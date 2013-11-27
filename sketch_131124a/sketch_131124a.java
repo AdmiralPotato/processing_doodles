@@ -11,17 +11,17 @@ import java.util.*;
 
 public class sketch_131124a extends PApplet {
 
-	boolean exportMode = false;
+	boolean exportMode = true;
 
 	int
-		outputScale = 2,
-		size = 480,
-		half = size / 2,
-		currentFrame = 0,
-		maxFrames = 48,
-		samplesPerFrame = 32,
-		preserveAlpha = 0xff000000,
-		numberOfThings = 72;
+			outputScale = 2,
+			size = 480,
+			half = size / 2,
+			currentFrame = 0,
+			maxFrames = 48,
+			samplesPerFrame = 32,
+			preserveAlpha = 0xff000000,
+			numberOfThings = 72;
 	int[][]
 			motionBlurBuffer;
 
@@ -33,6 +33,7 @@ public class sketch_131124a extends PApplet {
 			tau = pi * 2;
 
 	ArrayList<Ob> obList = new ArrayList<Ob>();
+	PImage gradientImage;
 
 	public void setup(){
 		size(size * outputScale, size * outputScale, P3D);
@@ -40,14 +41,71 @@ public class sketch_131124a extends PApplet {
 		colorMode(HSB, 1.0f, 1.0f, 1.0f, 1.0f);
 		smooth(8);
 		motionBlurBuffer = new int[width * height][4];
+		gradientImage = createImage(width, height, ARGB);
 		addCircola(numberOfThings);
 	}
+
+	float minMax(float value, float min, float max){
+		return max(min(value, max), min);
+	}
+
+	//It should be noted that the first 3 args operate in fractions of the width of the window!
+	void drawRadialGradient(float xOffset, float yOffset, float maxDistance, int innerColor, int outerColor){
+		int
+				x, y,
+				a, r, g, b, //values per channel when iterating
+				colorThisPixel,
+				//ripping teh bits apart to get the 0 ~ 255 per channel
+				aStart = (innerColor >> 24 & 0xff),
+				rStart = (innerColor >> 16 & 0xff),
+				gStart = (innerColor >> 8 & 0xff),
+				bStart = (innerColor & 0xff),
+				aStop = (outerColor >> 24 & 0xff),
+				rStop = (outerColor >> 16 & 0xff),
+				gStop = (outerColor >> 8 & 0xff),
+				bStop = (outerColor & 0xff),
+				//getting the difference between the inner and the outer colors
+				aDiff = aStart - aStop,
+				rDiff = rStart - rStop,
+				gDiff = gStart - gStop,
+				bDiff = bStart - bStop;
+		float
+				xDiff, yDiff, distance, distanceFrac,
+				//widthOfOnePixelAsFraction fixes a weird problem I was getting with one pixel of the outerColor in the middle???
+				//actually, it's 2 pixels to compensate for being radius from center
+				widthOfOnePixelAsFraction = 2.0f / ((float) width);
+		gradientImage.loadPixels();
+		for(y = 0; y < height; y += 1){
+			for(x = 0; x < width; x += 1){
+				xDiff = ((float) x / width) - xOffset;
+				yDiff = ((float) y / width) - yOffset;
+				distance = sqrt(xDiff * xDiff + yDiff * yDiff);
+				distanceFrac = minMax((distance / maxDistance), widthOfOnePixelAsFraction, 1);
+				a = round(minMax((aStart - aDiff * distanceFrac), 0, 255));
+				r = round(minMax((rStart - rDiff * distanceFrac), 0, 255));
+				g = round(minMax((gStart - gDiff * distanceFrac), 0, 255));
+				b = round(minMax((bStart - bDiff * distanceFrac), 0, 255));
+				colorThisPixel = //k, let's superglue these channels back into a pixel
+						((a & 0xff) << 24) |
+								((r & 0xff) << 16) |
+								((g & 0xff) << 8) |
+								(b & 0xff);
+				gradientImage.pixels[y * width + x] = colorThisPixel;
+				//println(x, y, xOffset, yOffset, xDiff, yDiff, distanceFrac); //, a, r, g, b
+			}
+		}
+		gradientImage.updatePixels();
+		image(gradientImage, 0, 0);
+	}
+
 
 	public void draw(){
 		int
 				pixelIndex,
 				channelIndex,
 				sampleIndex;
+		pushMatrix();
+		translate(0,0,-20);
 		if(samplesPerFrame < 2){
 			sample();
 		}
@@ -81,15 +139,17 @@ public class sketch_131124a extends PApplet {
 			for(pixelIndex = 0; pixelIndex < pixels.length; pixelIndex++){
 				pixels[pixelIndex] =
 						(motionBlurBuffer[pixelIndex][0]/samplesPerFrame) << 24 | //alpha
-						(motionBlurBuffer[pixelIndex][1]/samplesPerFrame) << 16 | //red
-						(motionBlurBuffer[pixelIndex][2]/samplesPerFrame) << 8 | //green
-						(motionBlurBuffer[pixelIndex][3]/samplesPerFrame); //blue
+								(motionBlurBuffer[pixelIndex][1]/samplesPerFrame) << 16 | //red
+								(motionBlurBuffer[pixelIndex][2]/samplesPerFrame) << 8 | //green
+								(motionBlurBuffer[pixelIndex][3]/samplesPerFrame); //blue
 				//invert and preserveAlpha
 				//preserveAlpha = pixels[pixelIndex] >> 24 & 0xff;
 				//pixels[pixelIndex] = (~pixels[pixelIndex]) & 0x00ffffff | (preserveAlpha << 24);
 			}
 			updatePixels();
 		}
+		popMatrix();
+		drawRadialGradient(0.5f, 0.5f, 1.0f, 0x000000ff, 0x6600cc99);
 		if(exportMode){
 			saveFrame("0/###.png");
 		}
@@ -196,7 +256,18 @@ public class sketch_131124a extends PApplet {
 			radius = (148 * (1 - (frac * (offset + 1)))) + 4;
 		}
 		public void update() {
-			float positionalAngle = (time * tau) + (pi * frac * offset * 90);
+			float
+					//Binaura twisted: 37
+					//Binaura: 36
+					//Tricordia: 24
+					//Tricordia twisted: 24.5f
+					//Clovera: 18
+					//??: 16
+					//??: 60
+					//??: 90
+					//??: 120
+					phaseMultiplier = 24.4f,
+					positionalAngle = (time * tau) + (tau * frac * offset * phaseMultiplier);
 			angle = sin(time * tau) * pi * frac * offset;
 			x = cos(positionalAngle) * radius;
 			y = sin(positionalAngle) * radius;
@@ -205,18 +276,22 @@ public class sketch_131124a extends PApplet {
 		public void render() {
 			int
 					strokeColor = color(
-						((sinFrac(angle / 2.0f) * 0.125f) + 0.4f) % 1.0f, //hue
-						1.0f, //saturation
-						0.75f, //luminosity
-						1 //alpha
-					),
+					((sinFrac(angle / 2.0f) * 0.125f) + 0.4f) % 1.0f, //hue
+					1.0f, //saturation
+					0.75f, //luminosity
+					1 //alpha
+			),
 					fillColor = color(
 							((sinFrac(angle / 2.0f) * 0.125f) + 0.5f) % 1.0f, //hue
 							1.0f, //saturation
 							((1 - (frac * offset)) * 0.5f) % (1f / 20f), //luminosity
 							1 //alpha
 					),
-					numEdges = ((numberOfThings - offset) % 9) + 2;
+					//Tricordia: 9
+					//Clovera: 8
+					//Most of them: 6
+					mod = 6,
+					numEdges = ((numberOfThings - offset - 1) % mod) + 3;
 
 			pushMatrix();
 			translate(x, y, z);
