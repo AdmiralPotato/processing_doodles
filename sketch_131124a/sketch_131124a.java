@@ -19,7 +19,7 @@ public class sketch_131124a extends PApplet {
 			half = size / 2,
 			currentFrame = 0,
 			maxFrames = 48,
-			samplesPerFrame = 32,
+			samplesPerFrame = 64,
 			preserveAlpha = 0xff000000,
 			numberOfThings = 72;
 	int[][]
@@ -105,7 +105,8 @@ public class sketch_131124a extends PApplet {
 				channelIndex,
 				sampleIndex;
 		pushMatrix();
-		translate(0,0,-20);
+		//pushing back everything in the scene so it layers behind the radial gradient
+		translate(0,0,-40);
 		if(samplesPerFrame < 2){
 			sample();
 		}
