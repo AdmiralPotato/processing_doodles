@@ -15,6 +15,8 @@ public class sketch_131124a extends PApplet {
 			exportMode = true,
 			maskMode = false;
 
+	String modeLabel = "";
+
 	int
 			outputScale = 2,
 			size = 480,
@@ -152,11 +154,13 @@ public class sketch_131124a extends PApplet {
 			updatePixels();
 		}
 		popMatrix();
-		if(!maskMode){
+		if(maskMode){
+			modeLabel = "-transparent";
+		} else {
 			drawRadialGradient(0.5f, 0.5f, 1.0f, 0x000000ff, 0x6600cc99);
 		}
 		if(exportMode){
-			saveFrame("binaura_twisted-" + maxFrames + "/###.png");
+			saveFrame("clovera_twisted_" + maxFrames + modeLabel + "/###.png");
 		}
 		currentFrame++;
 		if(exportMode && currentFrame >= maxFrames){
@@ -275,7 +279,7 @@ public class sketch_131124a extends PApplet {
 					//??: 60
 					//??: 90
 					//??: 120
-					phaseMultiplier = 37.0f,
+					phaseMultiplier = 18.25f,
 					positionalAngle = (time * tau) + (tau * frac * offset * phaseMultiplier);
 			angle = sin(time * tau) * pi * frac * offset;
 			x = cos(positionalAngle) * radius;
@@ -299,7 +303,7 @@ public class sketch_131124a extends PApplet {
 					//Tricordia: 9
 					//Clovera: 8
 					//Most of them: 6
-					mod = 6,
+					mod = 8,
 					numEdges = ((numberOfThings - offset - 1) % mod) + 3;
 
 			pushMatrix();
