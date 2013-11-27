@@ -160,7 +160,7 @@ public class sketch_131124a extends PApplet {
 			drawRadialGradient(0.5f, 0.5f, 1.0f, 0x000000ff, 0x6600cc99);
 		}
 		if(exportMode){
-			saveFrame("clovera_twisted_" + maxFrames + modeLabel + "/###.png");
+			saveFrame("pentactus_twisted_" + maxFrames + modeLabel + "/###.png");
 		}
 		currentFrame++;
 		if(exportMode && currentFrame >= maxFrames){
@@ -275,11 +275,13 @@ public class sketch_131124a extends PApplet {
 					//Tricordia twisted: 24.4f
 					//Clovera: 18
 					//Clovera twisted: 18.25f
+					//Pentactus: 43.35f
 					//??: 16
 					//??: 60
 					//??: 90
 					//??: 120
-					phaseMultiplier = 18.25f,
+					//phaseMultiplier = 42f + ((float) mouseX / (float) width * 2),
+					phaseMultiplier = 43.35f,
 					positionalAngle = (time * tau) + (tau * frac * offset * phaseMultiplier);
 			angle = sin(time * tau) * pi * frac * offset;
 			x = cos(positionalAngle) * radius;
@@ -300,10 +302,11 @@ public class sketch_131124a extends PApplet {
 							((1 - (frac * offset)) * 0.5f) % (1f / 20f), //luminosity
 							1 //alpha
 					),
+					//Pentactus = 10
 					//Tricordia: 9
 					//Clovera: 8
 					//Most of them: 6
-					mod = 8,
+					mod = 10,
 					numEdges = ((numberOfThings - offset - 1) % mod) + 3;
 
 			pushMatrix();
