@@ -11,7 +11,9 @@ import java.util.*;
 
 public class sketch_131124a extends PApplet {
 
-	boolean exportMode = true;
+	boolean
+			exportMode = true,
+			maskMode = false;
 
 	int
 			outputScale = 2,
@@ -150,9 +152,11 @@ public class sketch_131124a extends PApplet {
 			updatePixels();
 		}
 		popMatrix();
-		drawRadialGradient(0.5f, 0.5f, 1.0f, 0x000000ff, 0x6600cc99);
+		if(!maskMode){
+			drawRadialGradient(0.5f, 0.5f, 1.0f, 0x000000ff, 0x6600cc99);
+		}
 		if(exportMode){
-			saveFrame("0/###.png");
+			saveFrame("binaura_twisted-" + maxFrames + "/###.png");
 		}
 		currentFrame++;
 		if(exportMode && currentFrame >= maxFrames){
@@ -164,8 +168,11 @@ public class sketch_131124a extends PApplet {
 	public void sample(){
 		int i, len = obList.size();
 		Ob ob;
-
-		background(0);
+		if(maskMode){
+			clear();
+		} else {
+			background(0);
+		}
 
 		blendMode(ADD);
 
@@ -261,13 +268,14 @@ public class sketch_131124a extends PApplet {
 					//Binaura twisted: 37
 					//Binaura: 36
 					//Tricordia: 24
-					//Tricordia twisted: 24.5f
+					//Tricordia twisted: 24.4f
 					//Clovera: 18
+					//Clovera twisted: 18.25f
 					//??: 16
 					//??: 60
 					//??: 90
 					//??: 120
-					phaseMultiplier = 24.4f,
+					phaseMultiplier = 37.0f,
 					positionalAngle = (time * tau) + (tau * frac * offset * phaseMultiplier);
 			angle = sin(time * tau) * pi * frac * offset;
 			x = cos(positionalAngle) * radius;
